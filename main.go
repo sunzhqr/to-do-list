@@ -55,7 +55,7 @@ func main() {
 				return c.Status(fiber.StatusOK).JSON(todos[todoIdx])
 			}
 		}
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"meassage": "Todo not found"})
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Todo not found"})
 	})
 
 	app.Delete("/api/todos/:id", func(c *fiber.Ctx) error {
@@ -66,7 +66,7 @@ func main() {
 				return c.Status(fiber.StatusNoContent).JSON(fiber.Map{"message": "Todo deleted"})
 			}
 		}
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"meassage": "Todo not found"})
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Todo not found"})
 	})
 	log.Fatal(app.Listen(":" + PORT))
 }
