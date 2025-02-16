@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -46,6 +47,10 @@ func main() {
 	collection = client.Database("golang_db").Collection("todos")
 
 	app := fiber.New()
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: "http://localhost:5173",
+		AllowHeaders: "Origin,Content-Type,Accept",
+	}))
 
 	app.Get("/api/todos", getTodos)
 	app.Post("/api/todos", createTodo)
@@ -109,25 +114,58 @@ func updateTodo(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid ID"})
 	}
-	filter := bson.M{"_id": objectID}
-	update := bson.M{"$set": bson.M{"completed": true}}
-	_, err = collection.UpdateOne(context.Background(), filter, update)
+
+	var existingTodo Todo
+	err = collection.FindOne(context.Background(), bson.M{"_id": objectID}).Decode(&existingTodo)
+	if err == mongo.ErrNoDocuments {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Todo not found"})
+	} else if err != nil {
+		return err
+	}
+
+	updateData := new(Todo)
+	if err := c.BodyParser(updateData); err != nil {
+		return err
+	}
+
+	updateFields := bson.M{}
+	if updateData.Body != "" {
+		updateFields["body"] = updateData.Body
+	}
+
+	if updateData.Completed {
+		updateFields["completed"] = false
+	} else {
+		updateFields["completed"] = true
+	}
+
+	update := bson.M{"$set": updateFields}
+	_, err = collection.UpdateOne(context.Background(), bson.M{"_id": objectID}, update)
 	if err != nil {
 		return err
 	}
+
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"message": "Todo updated successfully"})
 }
-
 func deleteTodo(c *fiber.Ctx) error {
 	id := c.Params("id")
 	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid ID"})
 	}
-	filter := bson.M{"_id": objectID}
-	_, err = collection.DeleteOne(context.Background(), filter)
+
+	var existingTodo Todo
+	err = collection.FindOne(context.Background(), bson.M{"_id": objectID}).Decode(&existingTodo)
+	if err == mongo.ErrNoDocuments {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Todo not found"})
+	} else if err != nil {
+		return err
+	}
+
+	_, err = collection.DeleteOne(context.Background(), bson.M{"_id": objectID})
 	if err != nil {
 		return err
 	}
+
 	return c.Status(fiber.StatusNoContent).JSON(fiber.Map{"message": "Todo deleted successfully"})
 }
