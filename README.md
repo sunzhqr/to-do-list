@@ -24,8 +24,8 @@ A simple **To-Do List** application built using **Go (Fiber) + MongoDB + React**
 
 ### 1️⃣ Clone the Repository  
 \`\`\`sh
-git clone https://github.com/your-username/todo-app.git
-cd todo-app
+git clone https://github.com/sunzhqr/to-do-list
+cd to-do-list
 \`\`\`
 
 ---
@@ -41,13 +41,14 @@ PORT=3000
 
 #### **Step 2: Install Dependencies**  
 \`\`\`sh
-cd backend
 go mod tidy
 \`\`\`
 
 #### **Step 3: Start the Server**  
 \`\`\`sh
 go run main.go
+or 
+air
 \`\`\`
 
 ---
@@ -56,7 +57,7 @@ go run main.go
 
 #### **Step 1: Install Dependencies**  
 \`\`\`sh
-cd frontend
+cd client
 npm install
 \`\`\`
 
@@ -83,7 +84,7 @@ Content-Type: application/json
 
 {
   "body": "New Task",
-  "completed": false
+  "completed": false // actually, it allows you to omit this field
 }
 \`\`\`
 
@@ -96,10 +97,6 @@ Content-Type: application/json
 ✔ **Mark tasks as complete/incomplete**  
 ✔ **Persistent storage using MongoDB**  
 ✔ **Minimalist and user-friendly UI**  
-
----
-
-## 📸 Screenshots  
 
 ---
 
