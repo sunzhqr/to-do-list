@@ -24,7 +24,7 @@ A simple **To-Do List** application built using **Go (Fiber) + MongoDB + React**
 
 ### 1️⃣ Clone the Repository  
 \`\`\`sh
-git clone https://github.com/sunzhqr/to-do-list
+git clone https://github.com/sunzhqr/to-do-list.git
 cd to-do-list
 \`\`\`
 
